@@ -1,0 +1,12 @@
+{
+  "identifier": "default",
+  "description": "TrimLab default capabilities",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "dialog:default",
+    "fs:default",
+    "shell:default",
+    "notification:default"
+  ]
+}
