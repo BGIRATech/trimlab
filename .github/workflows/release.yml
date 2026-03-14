@@ -16,22 +16,22 @@ jobs:
         include:
           - platform: windows-latest
             args: ""
-            artifact: TrimLab-Setup.msi
+            final_name: TrimLab-Setup.msi
             glob: "src-tauri/target/release/bundle/msi/*.msi"
 
           - platform: macos-latest
             args: "--target aarch64-apple-darwin"
-            artifact: TrimLab-Setup-arm.dmg
+            final_name: TrimLab-Setup-arm.dmg
             glob: "src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg"
 
           - platform: macos-latest
             args: "--target x86_64-apple-darwin"
-            artifact: TrimLab-Setup-intel.dmg
+            final_name: TrimLab-Setup-intel.dmg
             glob: "src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/*.dmg"
 
           - platform: ubuntu-22.04
             args: ""
-            artifact: TrimLab-Setup.AppImage
+            final_name: TrimLab-Setup.AppImage
             glob: "src-tauri/target/release/bundle/appimage/*.AppImage"
 
     runs-on: ${{ matrix.platform }}
@@ -71,27 +71,16 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: TrimLab ${{ github.ref_name }}
-          releaseBody: |
-            ## TrimLab ${{ github.ref_name }}
-
-            ### Téléchargement
-            - **Windows** : `TrimLab-Setup.msi`
-            - **macOS Apple Silicon** : `TrimLab-Setup-arm.dmg`
-            - **macOS Intel** : `TrimLab-Setup-intel.dmg`
-            - **Linux** : `TrimLab-Setup.AppImage`
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
 
-      - name: Rename artifact
+      - name: Rename and upload artifact
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           FILE=$(ls ${{ matrix.glob }} | head -1)
-          DIR=$(dirname "$FILE")
-          cp "$FILE" "$DIR/${{ matrix.artifact }}"
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.artifact }}
-          path: ${{ matrix.glob }}
+          echo "Found: $FILE"
+          cp "$FILE" "${{ matrix.final_name }}"
+          gh release upload ${{ github.ref_name }} "${{ matrix.final_name }}" --clobber
