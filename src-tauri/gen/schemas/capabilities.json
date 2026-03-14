@@ -1,1 +1,0 @@
-{"default":{"identifier":"default","description":"TrimLab default capabilities","local":true,"windows":["main"],"permissions":["core:default","dialog:default","fs:default","shell:default","notification:default"]}}
